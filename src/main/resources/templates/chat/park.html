@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<!--
+	Dimension by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>熊熊的聊天室</title>
+		<link rel="shortcut icon" href="/images/logo.ico">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+		<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+	</head>
+	<body class="is-preload">
+			<div id="wrapper">
+				<div style="background-color: black; position: relative; opacity: 0.7; padding: 40px; border-radius: 21px">
+					<a th:href="@{/}" style="position: absolute; right: 7%; top: 27px; font-size: 41px">X</a>
+					<h2 class="major">共有<strong th:text="${count}"></strong>人在公共聊天室</h2>
+
+					<blockquote>
+						这是一个公共聊天室，你可以在这畅所欲言，你的发言将被所有在该聊天室的人共享
+					</blockquote>
+					<div id="message"></div><br>
+					<section>
+						<div class="fields">
+							<div class="field">
+								<label>Message</label>
+								<textarea id="text" placeholder="Enter your message" rows="4"></textarea>
+							</div>
+						</div><br>
+						<ul class="actions">
+							<li><button onclick="send()" class="primary">Send Message</button></li>
+							<li><button onclick="closeWebSocket()">Close Connection</button></li>
+						</ul>
+					</section>
+				</div>
+				<!--获取后端信息-->
+				<p id="user" th:text="${name}" style="display: none"></p>
+				<p id="login" th:text="${login}" style="display: none"></p>
+				<p id="room" th:text="${room}" style="display: none"></p>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">&copy; Designed by: <a href="https://html5up.net/">HTML5 UP</a><br>Adapted by: <a href="https://github.com/Northboat">NorthBoat</a></p>
+				</footer>
+
+			</div>
+
+			<!-- BG -->
+			<img id="bg" style="opacity: 0.7;" src="/images/wrap.jpg" alt="#">
+
+			<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/main.js"></script>
+
+			<script>
+				let user = document.getElementById("user").innerText;
+				let login = document.getElementById("login").innerText;
+				console.log(name);
+
+				// 连接 websocket 服务器
+				let websocket = null;
+				let room  = document.getElementById("room").innerText;
+				//判断当前浏览器是否支持WebSocket
+				if(room === "null"){
+					throw SyntaxError();
+				} else if('WebSocket' in window) {
+					//改成你的地址http
+					websocket = new WebSocket("ws://fx35xt.natappfree.cc/chat/"+room);
+				} else {
+					alert('当前浏览器 Not support websocket')
+				}
+
+
+				//连接发生错误的回调方法
+				websocket.onerror = function() {
+					setMessageInnerHTML("WebSocket 连接发生错误");
+				};
+
+				//连接成功建立的回调方法
+				websocket.onopen = function() {
+					setMessageInnerHTML("WebSocket 连接成功");
+				}
+				//let U01data, Uidata, Usdata;
+				//接收到消息的回调方法
+				websocket.onmessage = function(event) {
+					console.log(event);
+					setMessageInnerHTML(event.data);
+					//setechart()
+				}
+
+				//连接关闭的回调方法
+				websocket.onclose = function() {
+					setMessageInnerHTML("WebSocket 连接关闭");
+				}
+
+				//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+				window.onbeforeunload = function() {
+					closeWebSocket();
+				}
+
+				//将消息显示在网页上
+				function setMessageInnerHTML(innerHTML) {
+					while(innerHTML.length > 32){
+						document.getElementById('message').innerHTML += innerHTML.substring(0, 32) + '<br/>';
+						innerHTML = innerHTML.substring(32);
+					}
+					document.getElementById('message').innerHTML += innerHTML + '<br/><br/>';
+				}
+
+				//关闭WebSocket连接
+				function closeWebSocket() {
+					websocket.close();
+				}
+
+				//发送消息
+				function send() {
+					let message = document.getElementById('text').value;
+					websocket.send(message);
+					document.getElementById("text").value = "";
+					// websocket.send('{"msg":"' + message + '"}');
+					// setMessageInnerHTML(message + "&#13;");
+				}
+			</script>
+	</body>
+</html>

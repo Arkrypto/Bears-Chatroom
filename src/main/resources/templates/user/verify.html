@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<!--
+	Dimension by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>熊熊的聊天室</title>
+		<link rel="shortcut icon" href="/images/logo.ico">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+			<div id="wrapper">
+                	<div style="background-color: black; position: relative; opacity: 0.7; padding: 40px; border-radius: 21px">
+						<a th:href="@{/}" style="position: absolute; right: 7%; top: 6%; font-size: 41px">X</a>
+						<h2 class="major">验证</h2>
+
+						<p th:text="${msg}"></p>
+
+						<section>
+							<form method="post" th:action="@{/verify}">
+								<div class="fields">
+									<div class="field">
+										<p>请输入验证码，有效期10分钟</p>
+										<input type="text" name="code" />
+									</div>
+								</div>
+								<ul class="actions">
+									<li><input type="reset" value="重置" class="primary" /></li>
+									<li><input type="submit" value="登录" /></li>
+								</ul>
+							</form>
+						</section>
+					</div>
+
+
+					
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Designed by: <a href="https://html5up.net/">HTML5 UP</a><br>Adapted by: <a href="https://github.com/Northboat">NorthBoat</a></p>
+					</footer>
+
+			</div>
+
+			<!-- BG -->
+			<img id="bg" style="opacity: 0.7;" src="/images/wrap.jpg" alt="#">
+
+			<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/main.js"></script>
+	</body>
+</html>

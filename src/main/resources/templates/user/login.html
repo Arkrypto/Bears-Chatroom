@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<!--
+	Dimension by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>熊熊的聊天室</title>
+		<link rel="shortcut icon" href="/images/logo.ico">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+			<div id="wrapper">
+                	<div style="background-color: black; position: relative; opacity: 0.7; padding: 40px; border-radius: 21px">
+						<a th:href="@{/}" style="position: absolute; right: 7%; top: 27px; font-size: 41px">X</a>
+						<h2 class="major">帐号管理</h2>
+
+						<section th:if="${#strings.isEmpty(user)}">
+							<blockquote>若未注册，请输入邮箱并获取验证码，我们将自动为你跳转到注册界面</blockquote>
+							<p th:text="${msg}"></p>
+							<h3 class="major">登录</h3>
+							<form method="post" th:action="@{/send}">
+								<div class="fields">
+									<div class="field">
+										<label>Name / Email</label>
+										<input type="text" name="account" value="" placeholder="Northboat / northboat@163.com" />
+									</div>
+								</div>
+								<ul class="actions">
+									<li><input type="submit" value="获取验证码" class="primary" /></li>
+								</ul>
+							</form>
+						</section>
+						<section th:if="${login} eq 1">
+							<h3>你好 <strong th:text="${user}"></strong></h3><br>
+							<ul class="actions">
+								<li><a th:href="@{/logout}">退出登录</a></li>
+							</ul>
+						</section>
+					</div>
+
+
+					
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Designed by: <a href="https://html5up.net/">HTML5 UP</a><br>Adapted by: <a href="https://github.com/Northboat">NorthBoat</a></p>
+					</footer>
+
+			</div>
+
+			<!-- BG -->
+			<img id="bg" style="opacity: 0.7;" src="/images/wrap.jpg" alt="#">
+
+			<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/main.js"></script>
+	</body>
+</html>

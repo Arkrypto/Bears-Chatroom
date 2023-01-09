@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.northboat.bearchat.mapper.UserMapper">
+    <select id="queryAll" resultType="com.northboat.bearchat.pojo.User">
+        select * from name
+    </select>
+
+    <insert id="addName" parameterType="com.northboat.bearchat.pojo.User">
+        insert into name values (#{name},#{email})
+    </insert>
+
+    <insert id="addEmail" parameterType="com.northboat.bearchat.pojo.User">
+        insert into email values (#{email},#{name})
+    </insert>
+
+
+    <select id="queryByName" resultType="com.northboat.bearchat.pojo.User">
+        select * from name where name = #{name}
+    </select>
+
+    <select id="queryByEmail" resultType="com.northboat.bearchat.pojo.User">
+        select * from email where email = #{email}
+    </select>
+
+</mapper>
