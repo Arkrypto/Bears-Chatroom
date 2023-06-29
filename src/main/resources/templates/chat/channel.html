@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<!--
+	Dimension by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>熊熊的聊天室</title>
+		<link rel="shortcut icon" href="/images/logo.ico">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+		<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+	</head>
+	<body class="is-preload">
+			<div id="wrapper">
+				<header id="header">
+					<div style="text-align: left; background-color: black; position: relative; opacity: 0.7; padding: 40px; border-radius: 21px">
+						<div style="width: 100%; height: 40px">
+							<a th:href="@{/}" style="position: absolute; right: 4.5%; top: 2%; font-size: 32px">X</a>
+						</div>
+						<h2 th:text="${room.getId()}+号聊天室" class="major">
+						</h2>
+						<blockquote>
+							这是
+							<strong id="user1" th:text="${room.getUser1()}"></strong>
+							和
+							<strong id="user2" th:text="${room.getUser2()}"></strong>
+							的私人聊天室<br><br>可点击下方 ON/OFF 按钮选择是否保存消息记录，
+							点击下方 CLEAN 按钮可清屏
+						</blockquote>
+
+
+						<div id="used">
+							<div th:each="message: ${messages}">
+								<strong th:text="${message.from}"></strong><br>
+								<p th:text="${message.content}"></p>
+							</div>
+						</div>
+
+						<div id="message"></div><br>
+						<section>
+							<div class="fields">
+								<div class="field">
+									<label>Message</label>
+									<textarea id="text" placeholder="Enter your message" rows="4"></textarea>
+								</div>
+							</div><br>
+							<ul class="actions">
+								<li><button onclick="send()" class="primary">Send Message</button></li>
+								<li><button onclick="clean()">Clean</button></li>
+								<div style="margin-left: auto; margin-top: 1%" class="field half">
+									<input type="checkbox" id="history" onclick="store()" checked>
+									<label for="history">保存记录</label>
+								</div>
+							</ul>
+
+						</section>
+					</div>
+				</header>
+				<!--获取后端信息-->
+				<p id="room" th:text="${room.getId()}" style="display: none"></p>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">&copy; Designed by: <a href="https://html5up.net/">HTML5 UP</a><br>Adapted by: <a href="https://github.com/northboat">NorthBoat</a></p>
+				</footer>
+
+			</div>
+
+			<!-- BG -->
+			<img id="bg" style="opacity: 0.7;" src="/images/wrap.jpg" alt="#">
+
+			<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/main.js"></script>
+
+			<script>
+				// 连接 websocket 服务器
+				let websocket = null;
+				let room  = document.getElementById("room").innerText;
+				let flag = true;
+
+				let user = sessionStorage.getItem("user")
+				let user1 = document.getElementById("user1").innerText
+				let user2 = document.getElementById("user2").innerText
+				console.log(user + " " + user2)
+				if(user === user2){
+					user2 = user1;
+					user1 = user;
+				}
+
+				//console.log(room);
+				//判断当前浏览器是否支持WebSocket
+				if(room === "null"){
+					throw SyntaxError();
+				} else if('WebSocket' in window) {
+					//改成你的地址http
+					websocket = new WebSocket("ws://192.168.13.185:8080/chat/"+room);
+				} else {
+					alert('当前浏览器 Not support websocket')
+				}
+
+				if(websocket == null){
+					throw SyntaxError();
+				}
+
+				//连接发生错误的回调方法
+				websocket.onerror = function() {
+					setMessageInnerHTML("WebSocket 连接发生错误");
+				};
+
+				//连接成功建立的回调方法
+				websocket.onopen = function() {
+					setMessageInnerHTML("WebSocket 连接成功");
+				}
+				//let U01data, Uidata, Usdata;
+				//接收到消息的回调方法
+				websocket.onmessage = function(event) {
+					console.log(event);
+					setMessageInnerHTML(event.data);
+				}
+
+				//连接关闭的回调方法
+				websocket.onclose = function() {
+					setMessageInnerHTML("WebSocket 连接关闭");
+				}
+
+				//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+				window.onbeforeunload = function() {
+					closeWebSocket();
+				}
+
+				//将消息显示在网页上
+				function setMessageInnerHTML(innerHTML) {
+					document.getElementById('message').innerHTML += innerHTML + '<br/><br/>';
+				}
+
+				function insertMessage(message){
+					let params = {
+						"from": user1,
+						"to": user2,
+						"room": room,
+						"content": message
+					};
+					$.post("http://localhost:8080/insertMessage",params,function(result){
+						// console.log("nmsl")
+						console.log(result)
+						if(result.flag == true){
+							//跳转到indexUI对应的页面
+							console.log("insert message successfully");
+						}else{
+							console.log("error");
+						}
+						return false;//防止刷新时重复提交
+					});
+				}
+
+				//关闭WebSocket连接
+				function closeWebSocket() {
+					websocket.close();
+				}
+
+				function clean(){
+					let used = document.getElementById("used")
+					while(used.firstChild){
+						used.removeChild(used.firstChild)
+					}
+					document.getElementById("message").innerHTML = ""
+				}
+
+				function store(){
+					flag = !flag
+					console.log(flag)
+				}
+
+				//发送消息
+				function send() {
+					let message = document.getElementById('text').value;
+					websocket.send("<strong>"+user1+"</strong><br>" + message);
+					document.getElementById("text").value = "";
+					if(flag){
+						insertMessage(message);
+					}
+				}
+			</script>
+	</body>
+</html>

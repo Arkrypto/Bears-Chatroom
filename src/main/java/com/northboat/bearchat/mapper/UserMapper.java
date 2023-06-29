@@ -11,12 +11,12 @@ import java.util.List;
 public interface UserMapper {
 
     public List<User> queryAll();
-
-    public void addEmail(User user);
-
-    public void addName(User user);
-
+    public List<User> queryAllOnline();
+    public void add(User user);
+    public int online(String name);
     public User queryByName(String name);
-
     public User queryByEmail(String email);
+    public void logout(String name);
+    public List<User> searchUserByName(String name);
+    public List<User> searchUserByEmail(String email);
 }

@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>熊熊的聊天室</title>
+		<title>Shadow | Login</title>
 		<link rel="shortcut icon" href="/images/logo.ico">
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
@@ -15,9 +15,12 @@
 	</head>
 	<body class="is-preload">
 			<div id="wrapper">
-                	<div style="background-color: black; position: relative; opacity: 0.7; padding: 40px; border-radius: 21px">
-						<a th:href="@{/}" style="position: absolute; right: 7%; top: 27px; font-size: 41px">X</a>
-						<h2 class="major">帐号管理</h2>
+				<header id="header">
+                	<div style="text-align: left; background-color: black; position: relative; opacity: 0.7; padding: 40px; border-radius: 21px">
+						<div style="width: 100%; height: 40px">
+							<a th:href="@{/}" style="position: absolute; right: 4.5%; top: 2%; font-size: 32px">X</a>
+						</div>
+						<h2 class="major"\>帐号管理</h2>
 
 						<section th:if="${#strings.isEmpty(user)}">
 							<blockquote>若未注册，请输入邮箱并获取验证码，我们将自动为你跳转到注册界面</blockquote>
@@ -27,29 +30,55 @@
 								<div class="fields">
 									<div class="field">
 										<label>Name / Email</label>
-										<input type="text" name="account" value="" placeholder="Northboat / northboat@163.com" />
+										<input type="text" name="account" value="" placeholder="northboat / northboat@163.com" />
 									</div>
 								</div>
 								<ul class="actions">
 									<li><input type="submit" value="获取验证码" class="primary" /></li>
 								</ul>
 							</form>
+							<a href="#login">已有账户？点击此处密码登录</a>
 						</section>
-						<section th:if="${login} eq 1">
-							<h3>你好 <strong th:text="${user}"></strong></h3><br>
-							<ul class="actions">
-								<li><a th:href="@{/logout}">退出登录</a></li>
-							</ul>
+
+
+						<section th:if="${not #strings.isEmpty(login)} and ${login} ne 0">
+							<blockquote>你的每一次登录成功都让鼠鼠松一口气</blockquote>
+							<h3 style="display: inline">你好鸭!</h3>
+							<strong id="user" th:text="${user}"></strong><br><br>
+							<div style="margin-left: auto">
+								<a th:href="@{/logout}">Logout</a>
+							</div>
 						</section>
 					</div>
 
+				</header>
+				<div id="main">
+					<article id="login">
+						<h2 class="major">密码登录</h2>
+						<p th:text="${msg}"></p>
+						<form method="post" th:action="@{/sign}">
+							<div class="fields">
+								<div class="field half">
+									<label>请输入邮箱或昵称</label>
+									<input type="text" name="account" />
+								</div>
+								<div class="field half">
+									<label>请输入密码</label>
+									<input type="password" name="password"/>
+								</div>
+							</div>
+							<ul class="actions">
+								<li><input type="reset" value="重置" class="primary" /></li>
+								<li><input type="submit" value="登录" /></li>
+							</ul>
+						</form>
+					</article>
+				</div>
 
-					
-
-					<!-- Footer -->
-					<footer id="footer">
-						<p class="copyright">&copy; Designed by: <a href="https://html5up.net/">HTML5 UP</a><br>Adapted by: <a href="https://github.com/Northboat">NorthBoat</a></p>
-					</footer>
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">&copy; Designed by: <a href="https://github.com/Northboat">NorthBoat</a><br>
+				</footer>
 
 			</div>
 
@@ -62,5 +91,12 @@
 			<script src="/assets/js/breakpoints.min.js"></script>
 			<script src="/assets/js/util.js"></script>
 			<script src="/assets/js/main.js"></script>
+
+			<script>
+				let user = document.getElementById("user").innerText;
+				if(user != null){
+					sessionStorage.setItem("user", user.toString());
+				}
+			</script>
 	</body>
 </html>

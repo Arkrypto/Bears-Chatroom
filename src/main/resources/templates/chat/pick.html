@@ -22,32 +22,41 @@
 							<a th:href="@{/}" style="position: absolute; right: 4.5%; top: 2%; font-size: 32px">X</a>
 						</div>
 						<h2 class="major">
-							<strong>Rooms</strong>
+							<strong>Online Friends</strong>
 						</h2>
 
+						<section>
+							<form method="post" th:action="@{/search}">
+								<div class="fields">
+									<div class="field half">
+										<input placeholder="好友的昵称或邮箱" type="text" name="account" />
+									</div>
+									<div class="field half">
+										<div><input type="submit" value="查询" /></div>
+									</div>
+								</div>
+							</form>
+						</section>
+
 						<blockquote>
-							你的历史房间列表，温馨提示，点击房间编号可进入聊天室
+							在线用户列表，你可以点击发起邀请建立私人聊天室
 						</blockquote>
 
-						<p th:text="${msg}"></p>
+
 
 						<section>
 							<div class="table-wrapper">
-								<table class="alt">
+								<table>
 									<thead>
 									<tr>
-										<th>房间号</th>
-										<th>用户一</th>
-										<th>用户二</th>
-										<th>操作</th>
+										<th>在线用户</th>
+										<th>建立聊天</th>
 									</tr>
 									</thead>
-									<tbody th:each="room: ${rooms}">
+									<tbody th:each="friend: ${friends}">
 									<tr>
-										<td><a th:href="@{'/room/'+${room.id}}" th:text="${room.id}"></a></td>
-										<td th:text="${room.user1}"></td>
-										<td th:text="${room.user2}"></td>
-										<td><a th:href="@{'/delRoom/'+${room.id}}">删除房间</a></td>
+										<td th:text="${friend.getName()}"></td>
+										<td><a th:href="@{'/build/'+${friend.getName()}}">发起邀约</a></td>
 									</tr>
 									</tbody>
 								</table>

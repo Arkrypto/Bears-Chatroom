@@ -9,12 +9,8 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
-public class User {
-
-    private String name;
-
-    private String email;
-
-    private String password;
-
+public class Room {
+    private int id;
+    String user1;
+    String user2;
 }

@@ -1,13 +1,3 @@
----
-title: 基于 WebSocket 的聊天室
-date: 2022-2-24
-tags:
-  - Web
-  - Java
-categories:
-  - WebApp
----
-
 ## 前期准备
 
 ### SpringBoot 文件配置
@@ -28,6 +18,8 @@ yay -S jdk17-openjdk
 - `lombok`
 - `springboot-mail`
 - `websocket`
+
+pom.xml
 
 ```xml
 <dependencies>
@@ -1159,89 +1151,19 @@ public String park(HttpSession session, Model model){
 
 ### 私人聊天室实现
 
-在 Redis 里设置一个 set（online）用于记录在线用户，用以匹配好友
+数据库表项
 
-pick 函数，用以匹配好友
+room
 
-- 就是遍历 online 的集合（存储的用户昵称），通过用户昵称在 redis 里找`<昵称，房间号>`为空的用户，返回第一个（即在线且空闲用户）
-- 若找到空闲用户，为当前两个用户建立房间：redis 里昵称用于存房间号，房间号作为 key 以 list 存用户名双向绑定，返回房间号
+<img src="./assets/image-20230629092630003.png">
 
-```java
-// 选取私人房间号返回
-@Override
-public String pick(String account){
-    // 房间号统一用昵称存
-    User user = containAt(account) ? userMapper.queryByEmail(account) : userMapper.queryByName(account);
-    String self = user.getName();
-    String room = (String) redisUtil.get(self);
-    // 如果已有房间，直接返回
-    if(!Objects.isNull(room)){
-        return room;
-    }
-    // 否则找一个在线用户，组建房间返回房间号
-    for(Object onlineUser: redisUtil.sget("online")){
-        // 获取在线用户的名字
-        String friend = (String) onlineUser;
-        if(friend.equals(self)){
-            continue;
-        }
+message
 
-        // 如果当前用户在 redis 里存的房间为空，说明暂未配对
-        room = (String) redisUtil.get(friend);
+<img src="./assets/image-20230629092716402.png">
 
-        // 如果未配对，让这个用户和传进来的用户组建房间并返回房号
-        if(Objects.isNull(room)){
-            String tag = mailUtil.generateCode();
-            // 设置房间有效时间为1天
-            // 双向绑定
-            redisUtil.set(self, tag, 86400);
-            redisUtil.set(friend, tag, 86400);
-            // 把名字存到房间号
-            redisUtil.rpush(tag, self);
-            redisUtil.rpush(tag, friend);
-            redisUtil.expire(tag, 86400);
-            return tag;
-        }
-    }
-    // 若没找到在线空闲用户，返回"null"
-    return "null";
-}
+通过聊天室 id 创建 socket 信道，给予用户是否存储消息记录的选项，每次进入房间（id 对应的 socket 信道时，将历史记录返回到前端并显示）
 
-```
-
-Controller
-
-- 若未登录，跳转登陆界面
-- 若未找到空闲用户，返回`<"notfound", true>`
-- 若 pick 函数返回房间号不为`"null"`，说明匹配成功，从房间号中取出两个用户，同时返回房间号，进入房间`"user/room"`
-- 前端页面和公共聊天室基本相同，room 变为了私人的 6 位随机码，而不是 park
-
-```java
-@RequestMapping("/pick")
-public String pick(HttpSession session, Model model){
-    Integer login = (Integer) session.getAttribute("login");
-    if(Objects.isNull(login) || login == 0){
-        model.addAttribute("msg", "请先登录");
-        return "user/login";
-    }
-    String account = (String) session.getAttribute("user");
-    String room = userService.pick(account);
-    // 若房间为空
-    if(room.equals("null")){
-        model.addAttribute("notfound", true);
-        model.addAttribute("self", account);
-        model.addAttribute("friend", "空气");
-        model.addAttribute("room", room);
-        return "chat/room";
-    }
-    model.addAttribute("notfound", false);
-    List<String> names = userService.getRoom(room);
-    model.addAttribute("self", names.get(0));
-    model.addAttribute("friend", names.get(1));
-    model.addAttribute("room", room);
-    return "chat/room";
-}
-```
+通过 from/to 字段查找当前用户所拥有的房间号
 
 ## 测试
 

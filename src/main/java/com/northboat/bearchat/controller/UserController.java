@@ -20,13 +20,30 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping("/login")
+    @RequestMapping("/manage")
     public String login(HttpSession session, Model model){
         Integer login = (Integer) session.getAttribute("login");
         if(!Objects.isNull(login)){
             String user = (String) session.getAttribute("user");
             model.addAttribute("login", 1);
             model.addAttribute("user", user);
+        }
+        return "user/login";
+    }
+
+    @RequestMapping("/sign")
+    public String sign(Model model, HttpSession session,
+                       @RequestParam("account") String account, @RequestParam("password") String password){
+        int flag = userService.sign(account, password);
+        if(flag == 0){
+            model.addAttribute("msg", "用户不存在");
+        }else if(flag == -1){
+            model.addAttribute("msg", "秘密错误");
+        }else if(flag == 1){
+            session.setAttribute("login", 1);
+            session.setAttribute("user", account);
+            model.addAttribute("login", 1);
+            model.addAttribute("user", account);
         }
         return "user/login";
     }
@@ -58,6 +75,7 @@ public class UserController {
             System.out.println("登录成功");
             // 登录成功
             session.setAttribute("login", 1);
+            session.setAttribute("user", account);
             model.addAttribute("login", 1);
             model.addAttribute("user", account);
             return "user/login";
@@ -68,23 +86,23 @@ public class UserController {
 
     // 已注册，登录验证
     @RequestMapping("/register")
-    public String register(Model model, HttpSession session, @RequestParam("code") String code, @RequestParam("name") String name){
+    public String register(Model model, HttpSession session, @RequestParam("code") String code,
+                           @RequestParam("name") String name, @RequestParam("password") String password){
         String email = (String) session.getAttribute("user");
         if(Objects.isNull(email)){
             model.addAttribute("msg", "请先获取验证码");
             return "user/login";
         }
-        int flag = userService.register(email, code, name);
+        int flag = userService.register(email, code, name, password);
         if(flag == 2){
             model.addAttribute("msg", "验证码错误");
             return "user/register";
         } else if(flag == 3){
-            model.addAttribute("msg", "昵称已被使用或含有字符@");
+            model.addAttribute("msg", "昵称已被使用或含有违规字符@");
             return "user/register";
         }
-        User user = new User(name, email);
-        userService.addToDB(user);
         session.setAttribute("login", 1);
+        session.setAttribute("user", name);
         model.addAttribute("login", 1);
         model.addAttribute("user", name);
         return "user/login";
@@ -99,6 +117,6 @@ public class UserController {
         }
         session.removeAttribute("user");
         session.removeAttribute("login");
-        return "user/login";
+        return "index";
     }
 }
