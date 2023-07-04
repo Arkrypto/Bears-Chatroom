@@ -50,6 +50,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public void del(int id){
         roomMapper.delRoom(id);
+        messageMapper.del(id);
     }
 
     @Override

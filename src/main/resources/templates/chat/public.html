@@ -63,9 +63,14 @@
 				// 连接 websocket 服务器
 				let websocket = null;
 
+				let user = sessionStorage.getItem("user")
+				if(user == null){
+					user = "pass by"
+				}
+
 				if('WebSocket' in window) {	//判断当前浏览器是否支持WebSocket
 					//改成你的地址http
-					websocket = new WebSocket("ws://192.168.13.185:8080/chat/channel");
+					websocket = new WebSocket("ws://localhost:8080/chat/channel");
 				} else {
 					alert('当前浏览器 Not support websocket')
 				}
@@ -111,7 +116,7 @@
 				//发送消息
 				function send() {
 					let message = document.getElementById('text').value;
-					websocket.send(message);
+					websocket.send("<strong>"+user+"</strong><br>" + message);
 					document.getElementById("text").value = "";
 					// setMessageInnerHTML(message + "&#13;");
 				}

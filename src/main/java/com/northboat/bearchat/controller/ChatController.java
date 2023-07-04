@@ -35,14 +35,10 @@ public class ChatController {
 
     @RequestMapping("/park")
     public String park(HttpSession session, Model model){
-        int login = Objects.isNull(session.getAttribute("login")) ? 0 : 1;
-        String name = (String) session.getAttribute("user");
         int count = WebSocketServer.getOnlineCount() + 1;
 
         //System.out.println(WebSocketServer.getWebSocketSet().size());
 
-        model.addAttribute("login", login);
-        model.addAttribute("name", name);
         model.addAttribute("count", count);
         model.addAttribute("room", "park");
         return "chat/public";

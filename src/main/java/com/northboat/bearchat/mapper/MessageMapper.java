@@ -13,4 +13,6 @@ public interface MessageMapper {
     public void add(Message message);
 
     public List<Message> get(int room);
+
+    public void del(int room);
 }

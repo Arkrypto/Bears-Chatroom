@@ -12,5 +12,8 @@
         select * from message where room = #{room}
     </select>
 
+    <delete id="del">
+        delete from message where room = #{room}
+    </delete>
 
 </mapper>
